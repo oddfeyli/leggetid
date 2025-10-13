@@ -11,8 +11,12 @@
         input, select { width: 100%; padding: 8px; margin-bottom: 10px; box-sizing: border-box; }
         button { width: 100%; padding: 10px; background: #4CAF50; color: white; border: none; cursor: pointer; font-size: 16px; }
         button:hover { background: #45a049; }
+        #mojitoBtn { background: red !important; margin-top: 10px; }
+        #mojitoBtn:hover { background: darkred !important; }
         #result { margin-top: 20px; padding: 15px; background: white; border-radius: 5px; display: none; }
-        .mojito { background: #ffeb3b; color: #333; font-style: italic; }
+        .mojito { background: #ffeb3b; color: #333; font-style: italic; padding: 10px; margin-top: 10px; border-radius: 5px; }
+        #mojitoDisplay { display: none; margin-top: 10px; padding: 15px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 5px; text-align: center; }
+        #mojitoDisplay img { max-width: 100%; height: auto; margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -37,6 +41,10 @@
     <button onclick="beregn()">Beregn Leggetid!</button>
 
     <div id="result"></div>
+    <div id="mojitoDisplay">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Standard_version_of_Mojito_Cocktail.jpg" alt="Mojito Cocktail">
+        <p><strong>Mojito-prinsippet er påberopt!</strong><br>Ansikt må nå holdes i en introspektiv mine. Tanker og sinn må være åpne mens man vurderer dette!</p>
+    </div>
 
     <script>
         function beregnFratrekk(alder, innsats) {
@@ -61,6 +69,8 @@
             const resultDiv = document.getElementById('result');
             let html = '<h3>Resultat:</h3>';
 
+            let showMojitoBtn = false;
+
             if (unntak === 'sykdom') {
                 html += '<p>Alvorlig sykdom: Automatisk 23:00. Hvil deg!</p>';
             } else if (unntak === 'amputasjon' || unntak === 'fengsling') {
@@ -73,23 +83,31 @@
                 if (leggetidMin < 0) leggetidMin = 0;
                 html += `<p>Fratrekk: ${fratrekk.toFixed(1)} min</p>`;
                 html += `<p>Din leggetid: ${minutterTilKlokke(leggetidMin)}</p>`;
-
-                // Mojito
-                const mojitio = confirm('Påberoper du Mojito-prinsippet for en siste drink?');
-                if (mojitio) {
-                    html += '<div class="mojito"><strong>--- MOJITO AKTIVERT! ---</strong><br>';
-                    html += 'Proklamatøren har mandat til drømmen!<br>';
-                    html += 'De andre: *introspektiv mine* "Vi vurderer seriøst... Ryk og reis! +15 min (en drink)."<br>';
-                    const nyMin = leggetidMin + 15;
-                    html += `Ny leggetid: ${minutterTilKlokke(nyMin)}</p></div>`;
-                } else {
-                    html += '<p>Ingen Mojito. God natt!</p>';
-                }
+                html += '<p>Ingen Mojito. God natt!</p>';
+                showMojitoBtn = true;
             }
 
             resultDiv.innerHTML = html;
             resultDiv.style.display = 'block';
             resultDiv.scrollIntoView();
+
+            // Vis eller skjul Mojito-knapp
+            const mojitoBtn = document.getElementById('mojitoBtn');
+            if (showMojitoBtn) {
+                if (!mojitoBtn) {
+                    const btn = document.createElement('button');
+                    btn.id = 'mojitoBtn';
+                    btn.innerText = 'Påberop Mojito-Prinsippet!';
+                    btn.onclick = mojitoProklamasjon;
+                    resultDiv.appendChild(btn);
+                }
+            }
+        }
+
+        function mojitoProklamasjon() {
+            document.getElementById('mojitoDisplay').style.display = 'block';
+            document.getElementById('mojitoDisplay').scrollIntoView();
+            // Legg til +15 min logikk hvis ønskelig, men holder det enkelt som popup
         }
     </script>
 </body>
