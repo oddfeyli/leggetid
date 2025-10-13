@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leggetid-Beregneren (Statutt X)</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 400px; margin: 0 auto; padding: 20px; background: #f0f0f0; }
+        h1 { text-align: center; color: #333; }
+        label { display: block; margin: 10px 0 5px; font-weight: bold; }
+        input, select { width: 100%; padding: 8px; margin-bottom: 10px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background: #4CAF50; color: white; border: none; cursor: pointer; font-size: 16px; }
+        button:hover { background: #45a049; }
+        #result { margin-top: 20px; padding: 15px; background: white; border-radius: 5px; display: none; }
+        .mojito { background: #ffeb3b; color: #333; font-style: italic; }
+    </style>
+</head>
+<body>
+    <h1>🛌 Leggetid-Beregneren</h1>
+    <p><em>Standard: 02:00 (Dannelsesreise, Bord o.l.)</em></p>
+
+    <label for="alder">Din alder (hele år):</label>
+    <input type="number" id="alder" min="0" value="30">
+
+    <label for="innsats">Innsats kvelden før (min over 02:00):</label>
+    <input type="number" id="innsats" min="0" step="0.1" value="0">
+
+    <label for="unntak">Unntak? (sykdom, amputasjon, fengsling, pudding, ingen)</label>
+    <select id="unntak">
+        <option value="ingen">Ingen</option>
+        <option value="sykdom">Alvorlig sykdom</option>
+        <option value="amputasjon">Amputasjon</option>
+        <option value="fengsling">Fengsling</option>
+        <option value="pudding">Pudding-prinsippet</option>
+    </select>
+
+    <button onclick="beregn()">Beregn Leggetid!</button>
+
+    <div id="result"></div>
+
+    <script>
+        function beregnFratrekk(alder, innsats) {
+            const maxFratrekk = 120;
+            const midtpunkt = 60;
+            const k = 0.2;
+            const logistisk = maxFratrekk / (1 + Math.exp(-k * (alder - midtpunkt)));
+            return logistisk + innsats;
+        }
+
+        function minutterTilKlokke(min) {
+            const timer = Math.floor(min / 60);
+            const m = Math.floor(min % 60);
+            return `${timer.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+        }
+
+        function beregn() {
+            const alder = parseInt(document.getElementById('alder').value) || 30;
+            const innsats = parseFloat(document.getElementById('innsats').value) || 0;
+            const unntak = document.getElementById('unntak').value;
+
+            const resultDiv = document.getElementById('result');
+            let html = '<h3>Resultat:</h3>';
+
+            if (unntak === 'sykdom') {
+                html += '<p>Alvorlig sykdom: Automatisk 23:00. Hvil deg!</p>';
+            } else if (unntak === 'amputasjon' || unntak === 'fengsling') {
+                html += '<p>Force majeure: Umiddelbar retré. Pack opp teltet!</p>';
+            } else if (unntak === 'pudding') {
+                html += '<p>Pudding-prinsippet: Leggetid når DU vil. Pudding vinner!</p>';
+            } else {
+                const fratrekk = beregnFratrekk(alder, innsats);
+                let leggetidMin = 120 - fratrekk;
+                if (leggetidMin < 0) leggetidMin = 0;
+                html += `<p>Fratrekk: ${fratrekk.toFixed(1)} min</p>`;
+                html += `<p>Din leggetid: ${minutterTilKlokke(leggetidMin)}</p>`;
+
+                // Mojito
+                const mojitio = confirm('Påberoper du Mojito-prinsippet for en siste drink?');
+                if (mojitio) {
+                    html += '<div class="mojito"><strong>--- MOJITO AKTIVERT! ---</strong><br>';
+                    html += 'Proklamatøren har mandat til drømmen!<br>';
+                    html += 'De andre: *introspektiv mine* "Vi vurderer seriøst... Ryk og reis! +15 min (en drink)."<br>';
+                    const nyMin = leggetidMin + 15;
+                    html += `Ny leggetid: ${minutterTilKlokke(nyMin)}</p></div>`;
+                } else {
+                    html += '<p>Ingen Mojito. God natt!</p>';
+                }
+            }
+
+            resultDiv.innerHTML = html;
+            resultDiv.style.display = 'block';
+            resultDiv.scrollIntoView();
+        }
+    </script>
+</body>
+</html>
