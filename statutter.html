@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Statutter for Dannelsesreisen</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
         body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 30px; background: #f0f0f0; font-size: 16px; line-height: 1.6; }
         h1 { text-align: center; color: #333; font-size: 32px; margin-bottom: 40px; }
@@ -15,7 +17,6 @@
         .back-link { text-align: center; margin-top: 40px; font-size: 16px; }
         .back-link a { color: #4CAF50; text-decoration: none; font-weight: bold; }
         .back-link a:hover { text-decoration: underline; }
-        .math { font-family: monospace; background: #f9f9f9; padding: 10px; border-radius: 5px; }
     </style>
 </head>
 <body>
@@ -81,15 +82,17 @@
 
     <h2>Fratrekk</h2>
     <p>Standard leggetid kan avkortes basert på følgende, logistiske funksjon:</p>
-    <div class="math">
-        Fratrekk = Maksimalt fratrekk / (1 + e^(-k * (Alder - Midtpunkt))) + Innsats<br>
-        Hvor:<br>
-        • Maksimalt fratrekk er 120 minutter<br>
-        • Midtpunkt = 60 (alderen der fratrekket er halvparten av maksimalt).<br>
-        • k=0.2 (veksthastigheten til fratrekkskurven).<br>
-        • Alder: Medlemmets alder i hele år.<br>
-        • Innsats = innsats kvelden før målt i minutt over ikke diskontert leggetid 02:00.
-    </div>
+    $$
+    \text{Fratrekk} = \frac{M}{1 + e^{-k (A - M_i)}} + I
+    $$
+    <p>Hvor:</p>
+    <ul>
+        <li>$M$: Maksimalt fratrekk er 120 minutter</li>
+        <li>$M_i$: Midtpunkt = 60 (alderen der fratrekket er halvparten av maksimalt).</li>
+        <li>$k=0.2$ (veksthastigheten til fratrekkskurven).</li>
+        <li>$A$: Alder: Medlemmets alder i hele år.</li>
+        <li>$I$: Innsats = innsats kvelden før målt i minutt over ikke diskontert leggetid 02:00.</li>
+    </ul>
 
     <h2>Unntak fra leggetid</h2>
     <p>Medlemmer kan påberope seg tidligere avslutningstid ved force majeure, herunder:</p>
