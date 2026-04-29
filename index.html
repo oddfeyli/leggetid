@@ -6,145 +6,84 @@
     <title>Leggetid-Beregneren (Statutt X)</title>
     <style>
         :root {
-            --bg-start: #dbeafe;
-            --bg-end: #f0fdfa;
+            --bg: #f0f0f0;
+            --text: #222;
             --card: #ffffff;
-            --text: #0f172a;
-            --muted: #475569;
-            --border: #cbd5e1;
-            --accent: #0ea5a3;
-            --accent-hover: #0f766e;
-            --danger: #ef4444;
-            --danger-hover: #b91c1c;
-            --shadow: 0 20px 40px rgba(15, 23, 42, 0.15);
+            --muted: #f9f9f9;
+            --border: #ddd;
+            --accent: #4CAF50;
+            --accent-hover: #45a049;
+            --link: #2e7d32;
         }
 
         body.dark {
-            --bg-start: #0f172a;
-            --bg-end: #111827;
-            --card: #1e293b;
-            --text: #e2e8f0;
-            --muted: #94a3b8;
-            --border: #334155;
-            --accent: #2dd4bf;
-            --accent-hover: #14b8a6;
-            --shadow: 0 20px 40px rgba(2, 6, 23, 0.55);
+            --bg: #121212;
+            --text: #f1f1f1;
+            --card: #1e1e1e;
+            --muted: #222;
+            --border: #444;
+            --accent: #66bb6a;
+            --accent-hover: #57a85c;
+            --link: #81c784;
         }
 
-        * { box-sizing: border-box; }
-        body {
-            font-family: "Inter", "Segoe UI", Arial, sans-serif;
-            margin: 0;
-            min-height: 100vh;
-            padding: 16px;
-            background: linear-gradient(160deg, var(--bg-start), var(--bg-end));
-            color: var(--text);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .app-card {
-            width: min(100%, 460px);
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            box-shadow: var(--shadow);
-            padding: 20px;
-        }
-
-        h1 { margin: 0 0 8px; text-align: center; font-size: clamp(1.7rem, 5vw, 2.1rem); }
-        .intro { text-align: center; color: var(--muted); margin: 0 0 18px; }
-        label { display: block; margin: 14px 0 6px; font-weight: 700; }
-
-        input, select, button {
-            width: 100%;
-            min-height: 48px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            padding: 10px 12px;
-            font-size: 1rem;
-        }
-
-        input, select { background: var(--card); color: var(--text); }
-        input:focus, select:focus, button:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
-
-        button {
-            margin-top: 10px;
-            border: none;
-            color: #fff;
-            background: var(--accent);
-            font-weight: 700;
-            cursor: pointer;
-            transition: background 0.2s ease, transform 0.08s ease;
-        }
+        body { font-family: Arial, sans-serif; max-width: 400px; margin: 0 auto; padding: 30px; background: var(--bg); color: var(--text); font-size: 18px; }
+        h1 { text-align: center; color: var(--text); font-size: 28px; }
+        label { display: block; margin: 15px 0 8px; font-weight: bold; font-size: 18px; }
+        input, select { width: 100%; padding: 12px; margin-bottom: 15px; box-sizing: border-box; font-size: 18px; background: var(--card); color: var(--text); border: 1px solid var(--border); }
+        select { height: 60px; font-size: 20px; }
+        button { width: 100%; padding: 15px; background: var(--accent); color: white; border: none; cursor: pointer; font-size: 20px; }
         button:hover { background: var(--accent-hover); }
-        button:active { transform: scale(0.99); }
-
-        #mojitoBtn { background: var(--danger) !important; margin-top: 12px; }
-        #mojitoBtn:hover { background: var(--danger-hover) !important; }
-
-        #result, #mojitoDisplay {
-            margin-top: 16px;
-            padding: 16px;
-            border-radius: 14px;
-            background: color-mix(in srgb, var(--card) 90%, var(--bg-end));
-            border: 1px solid var(--border);
-            display: none;
-        }
-
-        #mojitoDisplay img { max-width: 100%; height: auto; border-radius: 10px; }
-        .statutt-link { text-align: center; margin: 14px 0 4px; }
-        .statutt-link a { color: var(--accent); text-decoration: none; font-weight: 600; }
+        #mojitoBtn { background: red !important; margin-top: 10px; }
+        #mojitoBtn:hover { background: darkred !important; }
+        #result { margin-top: 20px; padding: 20px; background: var(--card); border-radius: 5px; display: none; font-size: 18px; }
+        .mojito { background: #ffeb3b; color: #333; font-style: italic; padding: 15px; margin-top: 10px; border-radius: 5px; font-size: 18px; }
+        #mojitoDisplay { display: none; margin-top: 10px; padding: 20px; background: var(--muted); border: 1px solid var(--border); border-radius: 5px; text-align: center; font-size: 18px; }
+        #mojitoDisplay img { max-width: 100%; height: auto; margin-bottom: 10px; }
+        .statutt-link { text-align: center; margin: 20px 0; font-size: 16px; }
+        .statutt-link a { color: var(--link); text-decoration: none; font-weight: bold; }
         .statutt-link a:hover { text-decoration: underline; }
-
-        @media (min-width: 768px) {
-            .app-card { padding: 28px; }
-        }
     </style>
 </head>
 <body>
-    <main class="app-card">
-        <h1>🌙 Leggetidberegneren</h1>
-        <p class="intro"><em>Standard: 02:00 (før fratrekk)</em></p>
+    <h1>Leggetidberegneren</h1>
+    <p><em>Standard: 02:00 (før fratrekk)</em></p>
+    
+    <label for="tema">Tema:</label>
+    <select id="tema" onchange="settTema(this.value)">
+        <option value="light">Lyst</option>
+        <option value="dark">Mørkt</option>
+    </select>
 
-        <label for="tema">Tema:</label>
-        <select id="tema" onchange="settTema(this.value)">
-            <option value="light">Lyst ☀️</option>
-            <option value="dark">Mørkt 🌘</option>
-        </select>
+    <div class="statutt-link">
+        <a href="statutter.html" target="_blank">Les de omforente statuttene (åpnes i ny fane)</a>
+    </div>
 
-        <div class="statutt-link">
-            <a href="statutter.html" target="_blank">Les de omforente statuttene (åpnes i ny fane)</a>
-        </div>
+    <label for="alder">Din alder (hele år):</label>
+    <input type="number" id="alder" min="0" value="50">
 
-        <label for="alder">Din alder (hele år):</label>
-        <input type="number" id="alder" min="0" value="50">
+    <label for="innsats">Innsats kvelden før (minutter over kl 02:00):</label>
+    <input type="number" id="innsats" min="0" step="0.1" value="0">
 
-        <label for="innsats">Innsats kvelden før (minutter over kl 02:00):</label>
-        <input type="number" id="innsats" min="0" step="0.1" value="0">
+    <label for="unntak">Unntak:</label>
+    <select id="unntak">
+        <option value="ingen">Ingen</option>
+        <option value="sykdom">Alvorlig sykdom</option>
+        <option value="amputasjon">Amputasjon</option>
+        <option value="fengsling">Fengsling</option>
+        <option value="pudding">Pudding-prinsippet</option>
+    </select>
 
-        <label for="unntak">Unntak:</label>
-        <select id="unntak">
-            <option value="ingen">Ingen</option>
-            <option value="sykdom">Alvorlig sykdom</option>
-            <option value="amputasjon">Amputasjon</option>
-            <option value="fengsling">Fengsling</option>
-            <option value="pudding">Pudding-prinsippet</option>
-        </select>
+    <button onclick="beregn()">Beregn Leggetid!</button>
 
-        <button onclick="beregn()">Beregn leggetid</button>
-
-        <div id="result"></div>
-        <div id="mojitoDisplay">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Standard_version_of_Mojito_Cocktail.jpg" alt="Mojito Cocktail">
-            <p><strong>Mojito-prinsippet er påberopt!</strong><br>Ansikt må nå holdes i en introspektiv mine. Tanker og sinn må være åpne mens man vurderer dette.</p>
-        </div>
-    </main>
+    <div id="result"></div>
+    <div id="mojitoDisplay">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Standard_version_of_Mojito_Cocktail.jpg" alt="Mojito Cocktail">
+        <p><strong>Mojito-prinsippet er påberopt!</strong><br>Ansikt må nå holdes i en introspektiv mine. Tanker og sinn må være åpne mens man vurderer dette!</p>
+    </div>
 
     <script>
         initialiserTema();
-
         function settTema(tema) {
             document.body.classList.toggle('dark', tema === 'dark');
             localStorage.setItem('tema', tema);
@@ -176,7 +115,8 @@
             const unntak = document.getElementById('unntak').value;
 
             const resultDiv = document.getElementById('result');
-            let html = '<h3>📌 Resultat:</h3>';
+            let html = '<h3>Resultat:</h3>';
+
             let showMojitoBtn = false;
 
             if (unntak === 'sykdom') {
@@ -186,33 +126,38 @@
             } else if (unntak === 'fengsling') {
                 html += '<p>Fengsling. Nyt det mens du kan, i morgen er det på\'an igjen.</p>';
             } else if (unntak === 'pudding') {
-                html += '<p>Pudding-prinsippet: Jeg er en PUDDING! Jeg legger meg før leggetid. Som en PUDDING, altså.</p>';
+                html += '<p>Pudding-prinsippet: Jeg er en PUDDING! Jeg legger meg før leggetid. Som en PUDDING, altså</p>';
             } else {
                 const fratrekk = beregnFratrekk(alder, innsats);
                 let leggetidMin = 120 - fratrekk;
                 if (leggetidMin < 0) leggetidMin = 0;
                 html += `<p>Fratrekk: ${fratrekk.toFixed(1)} min</p>`;
-                html += `<p>Din leggetid: <strong>${minutterTilKlokke(leggetidMin)}</strong></p>`;
+                html += `<p>Din leggetid: ${minutterTilKlokke(leggetidMin)}</p>`;
                 html += '<p>Ingen Mojito. God natt!</p>';
                 showMojitoBtn = true;
             }
 
             resultDiv.innerHTML = html;
             resultDiv.style.display = 'block';
+            resultDiv.scrollIntoView();
 
+            // Vis eller skjul Mojito-knapp
             const mojitoBtn = document.getElementById('mojitoBtn');
-            if (showMojitoBtn && !mojitoBtn) {
-                const btn = document.createElement('button');
-                btn.id = 'mojitoBtn';
-                btn.innerText = 'Påberop Mojito-prinsippet!';
-                btn.onclick = mojitoProklamasjon;
-                resultDiv.appendChild(btn);
+            if (showMojitoBtn) {
+                if (!mojitoBtn) {
+                    const btn = document.createElement('button');
+                    btn.id = 'mojitoBtn';
+                    btn.innerText = 'Påberop Mojito-Prinsippet!';
+                    btn.onclick = mojitoProklamasjon;
+                    resultDiv.appendChild(btn);
+                }
             }
         }
 
         function mojitoProklamasjon() {
             document.getElementById('mojitoDisplay').style.display = 'block';
-            document.getElementById('mojitoDisplay').scrollIntoView({ behavior: 'smooth' });
+            document.getElementById('mojitoDisplay').scrollIntoView();
+            // Legg til +15 min logikk hvis ønskelig, men holder det enkelt som popup
         }
     </script>
 </body>
