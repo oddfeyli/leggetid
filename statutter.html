@@ -7,20 +7,88 @@
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 30px; background: #f0f0f0; font-size: 16px; line-height: 1.6; }
-        h1 { text-align: center; color: #333; font-size: 32px; margin-bottom: 40px; }
-        h2 { color: #4CAF50; font-size: 24px; border-bottom: 2px solid #4CAF50; padding-bottom: 10px; margin-top: 30px; }
-        ul.sub { list-style-type: lower-alpha; margin: 10px 0; padding-left: 30px; }
-        ul.disc { list-style-type: disc; margin: 10px 0; padding-left: 20px; }
+        :root {
+            --bg-start: #dbeafe;
+            --bg-end: #f0fdfa;
+            --card: #ffffff;
+            --text: #0f172a;
+            --muted: #475569;
+            --border: #cbd5e1;
+            --accent: #0ea5a3;
+            --shadow: 0 20px 40px rgba(15, 23, 42, 0.15);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-start: #0f172a;
+                --bg-end: #111827;
+                --card: #1e293b;
+                --text: #e2e8f0;
+                --muted: #94a3b8;
+                --border: #334155;
+                --accent: #2dd4bf;
+                --shadow: 0 20px 40px rgba(2, 6, 23, 0.55);
+            }
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            font-family: "Inter", "Segoe UI", Arial, sans-serif;
+            margin: 0;
+            padding: 16px;
+            background: linear-gradient(160deg, var(--bg-start), var(--bg-end));
+            color: var(--text);
+            line-height: 1.65;
+        }
+
+        .doc-card {
+            max-width: 860px;
+            margin: 0 auto;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            padding: 22px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 0;
+            font-size: clamp(1.8rem, 4vw, 2.2rem);
+        }
+
+        h2 {
+            color: var(--accent);
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            border-bottom: 2px solid color-mix(in srgb, var(--accent) 65%, transparent);
+            padding-bottom: 8px;
+            margin-top: 28px;
+        }
+
+        p, li { color: var(--text); }
+        ul.sub { list-style-type: lower-alpha; margin: 10px 0; padding-left: 26px; }
+        ul.disc { list-style-type: disc; margin: 10px 0; padding-left: 22px; }
         li { margin-bottom: 8px; }
-        p { margin: 10px 0; }
-        .back-link { text-align: center; margin-top: 40px; font-size: 16px; }
-        .back-link a { color: #4CAF50; text-decoration: none; font-weight: bold; }
+
+        .meta { text-align: center; color: var(--muted); margin-top: -8px; }
+        .back-link { text-align: center; margin-top: 34px; }
+        .back-link a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 700;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px 14px;
+            display: inline-block;
+            background: color-mix(in srgb, var(--card) 85%, var(--bg-end));
+        }
         .back-link a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
-    <h1>Statutter for Dannelsesreisen (2025)</h1>
+    <main class="doc-card">
+        <h1>📜 Statutter for Dannelsesreisen</h1>
+        <p class="meta">Revidert utgave (2025)</p>
 
     <h2>1. Formål</h2>
     <p>Dannelsesreisen er en gruppe av individer som i noen henseende og til enkelte tidspunkter har delvis overlappende motiver innenfor gruppens prinsipper.</p>
@@ -103,5 +171,6 @@
     <div class="back-link">
         <a href="index.html">Tilbake til Leggetid-Beregneren</a>
     </div>
+    </main>
 </body>
 </html>
