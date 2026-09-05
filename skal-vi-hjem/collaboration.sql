@@ -111,15 +111,28 @@ declare
  person jsonb; new_settings jsonb; key text; token text; result jsonb;
 begin
  if who is null then raise exception 'Logg inn anonymt først.' using errcode='42501'; end if;
+ if p_action is null or p_action not in('create','join','state','me','settings','rotate','delete') then
+   raise exception 'Ukjent handling.' using errcode='22023'; end if;
  if p_payload is null or jsonb_typeof(p_payload)<>'object' or octet_length(p_payload::text)>8000 then
    raise exception 'Ugyldig forespørsel.' using errcode='22023'; end if;
+ if p_action in('create','join') then
+   if (p_action='create' and (p_payload-array['title','person'])<>'{}'::jsonb)
+      or (p_action='join' and (p_payload-array['invite','person'])<>'{}'::jsonb) then
+     raise exception 'Ugyldige forespørselsfelt.' using errcode='22023'; end if;
+   person=p_payload->'person';
+   if not svh_private.valid_person(person) then
+     raise exception 'Ugyldige deltakeropplysninger.' using errcode='22023'; end if;
+   -- Validate input keys here; valid_person also checks full stored rows for 'me'.
+   if (person-array['name','age','tired','dance','retired','gone_home'])<>'{}'::jsonb then
+     raise exception 'Ugyldige deltakerfelt.' using errcode='22023'; end if;
+ elsif p_action in('state','rotate','delete') and p_payload<>'{}'::jsonb then
+   raise exception 'Denne handlingen krever en tom forespørsel.' using errcode='22023';
+ end if;
  if p_action='create' then
    perform pg_advisory_xact_lock(hashtextextended(who::text,0));
    if (select count(*) from public.svh_rooms where host_id=who and expires_at>now())>=3 then
      raise exception 'Du har allerede tre aktive kvelder. Slett en først.' using errcode='22023'; end if;
    if jsonb_typeof(p_payload->'title') is distinct from 'string' then raise exception 'Kvelden mangler navn.' using errcode='22023'; end if;
-   person=p_payload->'person';
-   if not svh_private.valid_person(person) then raise exception 'Ugyldige deltakeropplysninger.' using errcode='22023'; end if;
    new_settings=jsonb_build_object('date',to_char(now() at time zone 'Europe/Oslo','YYYY-MM-DD'),
     'time',to_char(now() at time zone 'Europe/Oslo','HH24:MI'),'realClock',true,'tomorrow',true,'oneMore',false,
     'banger',false,'pensionRule',true,'weights',jsonb_build_object('tired',6,'dance',4.5,'age',0.12,'sine',6));
@@ -142,8 +155,6 @@ begin
        raise exception 'Invitasjonen er ugyldig eller erstattet av en ny lenke.' using errcode='42501'; end if;
      if (select count(*) from public.svh_members where room_id=r.id)>=40 then
        raise exception 'Kvelden har nådd grensen på 40 deltakere.' using errcode='22023'; end if;
-     person=p_payload->'person';
-     if not svh_private.valid_person(person) then raise exception 'Ugyldige deltakeropplysninger.' using errcode='22023'; end if;
      insert into public.svh_members(room_id,user_id,name,age,tired,dance,retired,gone_home)
      values(r.id,who,btrim(person->>'name'),(person->>'age')::smallint,(person->>'tired')::smallint,
        (person->>'dance')::smallint,(person->>'retired')::boolean,(person->>'gone_home')::boolean);

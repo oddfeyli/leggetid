@@ -2,7 +2,13 @@
 
 ## Status 5. september 2026
 
-Samarbeidskoden er klargjort, men **ikke aktivert**. Supabase er ennå ikke koblet til. Ingen database er opprettet, ingen migrering er kjørt og ingen nøkkel er lagt inn. `collaboration-config.js` har derfor `enabled: false`.
+Samarbeidskoden er klargjort, men **ikke aktivert**. Supabase-prosjektet `skal-vi-hjem` (`gmuupsahnfoooiinpwfs`) er opprettet i Stockholm (`eu-north-1`) på eksisterende gratisplan. Databasen, RLS og Realtime er installert og kontrollert. Bare prosjekt-URL og offentlig publishable key er lagt inn i `collaboration-config.js`; `enabled: false` er beholdt.
+
+**Gjenstående sperre:** Anonymous Sign-Ins er fortsatt deaktivert, bekreftet mot prosjektets `/auth/v1/settings`. Supabase-integrasjonen har ingen handling for Auth-konfigurasjon, og innlogging til kontrollpanelet ble ikke fullført. Aktiver **Allow anonymous sign-ins** under [Authentication → Sign In / Providers](https://supabase.com/dashboard/project/gmuupsahnfoooiinpwfs/auth/providers) før live-testene kjøres. Ingen secrets eller administrasjonsnøkler trengs i appen eller testene.
+
+Kjørte migreringer: `svh_collaboration_initial` og `svh_strict_payloads`. `collaboration.sql` inneholder det samlede oppsettet for en ny database og skal ikke kjøres om igjen i dette allerede opprettede prosjektet.
+
+Neste steg: bekreft anonym Auth, kjør `node tests/skal-vi-hjem-live.mjs` fra repoets rot, test klientflyten med to separate nettleseridentiteter, og aktiver/publiser først når kontrollene består. PR #3 er fortsatt et utkast; GitHub Pages er ikke endret.
 
 Original `index.html`, `app-1.js`, `app-2.js`, `app-3.js`, CSS og lokal lagring er uendret. Den nye siden er `sammen.html`. Den gjenbruker modellfunksjonene i `app-1.js`, men kjører ikke originalens lokal-lagringskode.
 
@@ -36,7 +42,13 @@ Supabase lagrer samarbeidsdata; jsDelivr leverer klientbiblioteket ved tilkoblin
 
 JavaScript-syntakskontroll er bestått. Sju frontend-sjekker er kjørt i headless Chromium med to separate nettleserkontekster og en kontrollert **simulert** database/sanntidskanal: deaktivert konfigurasjon, delt manntall og UI-rettigheter, samtidige endringer og lik gruppedom, avreise/retur, ny sending etter feil, gjeninntreden med samme testidentitet samt mobilbredde uten JavaScript-feil.
 
-**Ikke testet:** SQL-migreringens kjøring, faktiske PostgreSQL/RLS-rettigheter, Supabase Auth, ekte WebSocket-transport, Edge og iOS Safari. Disse er sperrer før aktivering. Se `../tests/skal-vi-hjem-browser.py` for frontend-testen. Den injiserer lokale HTML-/skriptbytes direkte og bruker ingen nettverkstjeneste. Testen er ikke et bevis på databasesikkerhet.
+**Kontrollert i Supabase:** begge migreringene kjørte uten feil; alle tre tabeller har RLS; rom og medlemmer har medlemsavgrensede SELECT-policyer; bare `public.svh_rooms` ligger i Realtime-publikasjonen. Den private invitasjonstabellen har ingen klienttilgang. Security Advisor rapporterer ingen advarsler eller feil, bare den tilsiktede INFO-merknaden om RLS uten policy på `svh_private.invites`. Den oppdaterte RPC-funksjonen er lest tilbake og samsvarer med lokal SQL. Alle 13 direkte PostgreSQL-tester av deltakerverdier bestod.
+
+**Klargjort for ekte tjenestetest:** `../tests/skal-vi-hjem-live.mjs` bruker tre separate anonyme Auth-identiteter og bare den offentlige klientnøkkelen. Den kontrollerer samtidige feltendringer, vertstilgang, direkte skrivesperrer, romisolasjon, ugyldige verdier/ekstra felt, invitasjonsrotering, faktisk Realtime over WebSocket, gjenoppkobling og romsletting. Testen sletter sine egne testrom og logger ut testidentitetene. En valgfri rapport (`SVH_REPORT_PATH=/tmp/svh-live-report.json`) gir rom- og bruker-ID-er for databaseeierens etterkontroll; tokens og invitasjoner logges ikke. Anonyme Auth-kontoer må ryddes separat av eieren.
+
+**Bestått utløpstest i PostgreSQL:** `../tests/skal-vi-hjem-expiry.sql` oppretter midlertidige vert-/gjest-fixtures i én transaksjon. Begge har tilgang før utløp; deretter skjuler RLS rom og medlemmer for begge, og alle seks `state`/`me`/`join`-forsøk avvises med `P0002`. Testen bruker database-rollen `authenticated` med syntetiske JWT-claims, ikke ekte Auth-pålogging. Alt ble rullet tilbake; null fixture-brukere og null fixture-rom gjenstod.
+
+**Ikke kjørt ennå:** ekte anonym Auth, live API-/WebSocket-test, to samtidige nettleseridentiteter mot Supabase, Edge og iOS Safari. Ikke beskriv disse som bestått før de faktisk er kjørt. Den eldre `../tests/skal-vi-hjem-browser.py` injiserer HTML/skript med simulert backend og er ikke bevis på databasesikkerhet.
 
 ## Referanser for oppsettet
 
