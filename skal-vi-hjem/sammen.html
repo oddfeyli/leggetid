@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="nb">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="no-referrer"><meta name="theme-color" content="#141812">
+<title>Skal vi hjem? – Samme kveld. Felles synsing.</title>
+<link rel="stylesheet" href="style-1.css"><link rel="stylesheet" href="style-2.css"><link rel="stylesheet" href="style-3.css">
+<style>
+.cloud-box{padding:24px;margin:22px 0;border:1px solid var(--border,#343a2c);border-radius:16px;background:var(--panel,#1e241b)}
+.cloud-line{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.cloud-line>*{min-width:0}.cloud-line a{color:var(--accent,#c3e578)}
+.cloud-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,290px),1fr));gap:16px}
+.cloud-field{display:block;margin:16px 0}.cloud-field>span{display:block;margin-bottom:7px;font-size:14px}
+.cloud-field input:not([type=checkbox]){width:100%}.cloud-field input[type=range]{padding:0}.cloud-field input[type=checkbox]{width:22px;height:22px;accent-color:#c3e578}
+.cloud-field input[type=text],.cloud-field input[type=number]{background:#171d14;color:#f2f1e8;border:1px solid #48523d;border-radius:8px;padding:12px;font:inherit}
+.cloud-muted{color:#bec5b6;font-size:14px;line-height:1.6}.cloud-score{font-size:56px;letter-spacing:-.05em;font-weight:800}.cloud-person{padding:20px;border:1px solid #48523d;border-radius:13px}.cloud-person h3{margin:0 0 10px}.cloud-person p{line-height:1.5}
+.cloud-person[data-mine=true]{border-color:#c3e578}.cloud-person[data-home=true]{opacity:.65}.cloud-person output{float:right;font-variant-numeric:tabular-nums}
+#cloud-status{padding:12px 16px;border-radius:8px;background:#252d20;font-size:14px;line-height:1.5;margin-top:18px}
+#cloud-status[data-error=true]{background:#4b2420;color:#ffded4}.cloud-settings fieldset{border:0;padding:0;margin:0}.cloud-settings fieldset:disabled{opacity:.65}.cloud-settings summary{cursor:pointer;font-size:20px;font-weight:700}
+.cloud-code{overflow-wrap:anywhere;white-space:pre-wrap;line-height:1.7;font:14px ui-monospace,monospace}.cloud-invite{width:100%;padding:12px;margin-top:10px;font:14px monospace}
+[hidden]{display:none!important}button:disabled{opacity:.45;cursor:not-allowed}input:disabled{opacity:.65;cursor:not-allowed}a.btn{text-decoration:none}
+@media(max-width:480px){.cloud-box{padding:17px}.cloud-score{font-size:44px}}
+</style>
+<script src="collaboration-config.js" defer></script><script src="app-1.js" defer></script><script src="collaboration.js" defer></script>
+</head>
+<body><header class="wrap topbar"><div><div class="brand-name">KVELDSDIREKTORATET</div><div class="brand-sub">Avdeling for kollektiv avrunding</div></div><a class="btn btn-quiet" href="./">Lokalmodus</a></header>
+<main class="wrap">
+<section class="hero"><div><div class="eyebrow">Samarbeidsutgaven · Ingen alene om å være trøtt</div><h1>Skal vi hjem<span>?</span></h1><p class="hero-sub">Samme kveld. Samme dom. Hver deres skyveknapp.</p></div></section>
+<div class="humor-note"><strong>BARE HUMOR</strong><span>Dette er oppdiktet matematikk, ikke vitenskap eller helseråd. Du kan gå hjem uten flertall.</span></div>
+<div id="cloud-status" role="status" aria-live="polite">Kontrollerer tilkoblingen.</div>
+<section class="cloud-box" id="cloud-setup" hidden><h2>Samarbeidsmodus er ikke aktivert ennå</h2><p>Nettsiden er klargjort, men den felles databasen er ikke koblet til. Ingen deltakeropplysninger er sendt.</p><p class="cloud-muted">Når Supabase er koblet til og oppsettet er testet, kan verten opprette en kveld og dele invitasjonen. Lokalmodus fungerer som før.</p><a href="./" class="btn btn-primary">Bruk lokalmodus</a></section>
+<form class="cloud-box" id="cloud-entry" hidden><h2 id="cloud-entry-title">Opprett en felles kveld</h2><label class="cloud-field" id="cloud-title-field"><span>Kveldens navn</span><input id="cloud-title" type="text" maxlength="60" required value="Gutta på lørdag"></label>
+<div class="cloud-grid"><label class="cloud-field"><span>Ditt navn eller kallenavn</span><input id="cloud-name" type="text" maxlength="40" autocomplete="nickname" required></label><label class="cloud-field"><span>Alder</span><input id="cloud-age" type="number" min="0" max="120" step="1" value="59" required></label></div>
+<p class="cloud-muted">Når du blir med, deler du navn, alder, trøtthet, dansevilje og pensjoniststatus med alle i kvelden. Bruk gjerne kallenavn. Invitasjonslenken gir adgang; ikke legg den offentlig.</p>
+<button class="btn btn-primary" type="submit" id="cloud-enter">Opprett kveld</button><p class="cloud-muted">Ingen e-post eller passord. Din deltakeridentitet huskes i denne nettleseren. Ny enhet, privat fane eller slettede nettleserdata gir en ny identitet.</p></form>
+<section id="cloud-room" hidden>
+<div class="cloud-box"><div class="cloud-line"><h2 id="cloud-room-title"></h2><span class="cloud-muted" id="cloud-role"></span></div><p class="cloud-muted" id="cloud-room-info"></p><div class="cloud-line"><button class="btn" id="cloud-share">Kopier invitasjon</button><button class="btn btn-quiet" id="cloud-sync">Prøv synkronisering på nytt</button><button class="btn btn-quiet" id="cloud-rotate" hidden>Ny invitasjonslenke</button><button class="btn btn-quiet" id="cloud-delete" hidden>Slett kvelden</button></div><input class="cloud-invite" id="cloud-link" aria-label="Invitasjonslenke" readonly hidden></div>
+<div class="cloud-box"><div class="panel-eyebrow">Gruppens felles dom</div><h2 class="verdict-heading" id="cloud-verdict">INGEN I SALEN.</h2><div class="cloud-score"><span id="cloud-score">—</span><small style="font-size:18px"> / 100</small></div><p id="cloud-reason"></p><p class="cloud-muted" id="cloud-counts"></p><p class="cloud-muted" id="cloud-counter"></p><p class="cloud-muted" id="cloud-clock"></p><button class="btn btn-primary" id="cloud-ruling">Kopier dommen</button></div>
+<div class="cloud-line"><h2>Hvem er fortsatt her?</h2><p class="cloud-muted">Du styrer ditt eget kort. Pensjonistens privilegier er beklageligvis videreført.</p></div><div class="cloud-grid" id="cloud-people"></div>
+<details class="cloud-box cloud-settings"><summary>Vertens justerbare virkelighet</summary><p class="cloud-muted" id="cloud-permissions"></p><fieldset id="cloud-settings"></fieldset></details>
+<details class="cloud-box"><summary><strong>Matematikk med urimelig selvtillit</strong></summary><p class="cloud-code">Hᵢ = clip₀…₁₀₀[45 + a(Tᵢ−5) − b(Dᵢ−5) + c(Aᵢ−45)
++ 2,5 max(0,h*−22) + s sin(2π(m+7Aᵢ)/180)
++ L(år) + 10M(1−QPᵢ) − 9E − 8B(Dᵢ/10)]
+
+Aktiv §67b: π stemmer og fritak fra morgendagen.
+Trøtthet 0–8: indeks maks 24. Trøtthet 9–10: indeks 100.
+Gruppeindeks = Σ(vekt × personindeks) / Σvekt.</p><p class="cloud-muted">T: trøtthet, D: dansevilje, A: alder, m: minutter siden midnatt. h*: desimaltimer, pluss 24 før kl. 12. L: −4 i skuddår, ellers +1. M/E/B: morgendagen, én til, banger. Q/P: særregel, pensjonist. Vektene a/b/c/s justeres av verten. Skuddår er delelig på 4, unntatt hundreår som ikke er delelige på 400. Indeks avrundes til én desimal før vekting og klassifisering: under 35 = bli, under 60 = avrund, ellers hjem. De som har gått hjem tas ut av gruppedommen.</p><p><strong>Vitenskapelig grunnlag: ingen. Serverens klokke: Europe/Oslo.</strong></p></details>
+</section>
+<footer class="page-footer"><p class="cloud-muted">Samarbeidsmodus trenger internett og lagrer kveldens opplysninger hos Supabase. Appen har ingen analyseverktøy. Klientbiblioteket hentes fra jsDelivr først når du kobler til. Kvelden kan slettes av verten og utløper etter 48 timer; utløp sperrer tilgang, men er ikke det samme som fysisk sletting. Behold vertens nettleserdata til kvelden er slettet.</p></footer>
+</main><noscript><p>Denne appen trenger JavaScript. Det gjør byråkrati som regel.</p></noscript></body></html>
