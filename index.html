@@ -1,313 +1,164 @@
 <!DOCTYPE html>
-<html lang="nb">
+<html lang="no">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#101c29">
-  <meta name="description" content="Dannelsesreisens leggetidberegner. Alder, innsats og tvilsomt gode unnskyldninger — behandlet med unødvendig høytidelighet.">
-  <title>Leggetidberegneren · Dannelsesreisen</title>
-  <style>
-    :root {
-      color-scheme: light;
-      --bg: #edf1f5; --surface: #fff; --surface-raised: #f5f7fa;
-      --text: #172636; --muted: #576674; --line: #cdd6de;
-      --gold: #805620; --gold-soft: #f4ead7; --button: #172f41; --button-text: #fff;
-      --mint: #25674f; --mint-soft: #e6f3ed; --focus: #876120;
-      --shadow: 0 20px 70px #1224350b;
-    }
-    body.dark {
-      color-scheme: dark;
-      --bg: #0b141e; --surface: #101e2c; --surface-raised: #152536;
-      --text: #f2f3ee; --muted: #a5b5c5; --line: #2b3c4d;
-      --gold: #ebca8d; --gold-soft: #2c2b27; --button: #ebca8d; --button-text: #172433;
-      --mint: #a4dfc3; --mint-soft: #16392f; --focus: #ebca8d;
-      --shadow: 0 20px 70px #00000028;
-    }
-    * { box-sizing: border-box; }
-    [hidden] { display: none !important; }
-    html { scroll-behavior: smooth; }
-    body { margin: 0; background: var(--bg); color: var(--text); font: 1rem/1.6 "Aptos", "Segoe UI", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
-    a { color: inherit; text-underline-offset: 4px; }
-    button, input, select { font: inherit; }
-    button, a, input, select, summary { -webkit-tap-highlight-color: transparent; }
-    button, select, summary { cursor: pointer; }
-    button { touch-action: manipulation; }
-    :focus-visible { outline: 3px solid var(--focus); outline-offset: 4px; }
-    svg { width: 20px; height: 20px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
-    .shell { max-width: 1120px; padding: 0 32px; margin: 0 auto; }
-    .masthead { min-height: 92px; display: flex; align-items: center; justify-content: space-between; gap: 24px; border-bottom: 1px solid var(--line); }
-    .brand { display: flex; align-items: center; gap: 13px; }
-    .monogram { width: 43px; height: 43px; display: grid; place-items: center; border: 1px solid var(--gold); border-radius: 50%; font: 1.05rem Georgia, serif; color: var(--gold); letter-spacing: -.05em; }
-    .brand-name { font-weight: 650; letter-spacing: .01em; font-size: .9375rem; }
-    .brand-note { color: var(--muted); font-size: .75rem; letter-spacing: .12em; text-transform: uppercase; }
-    .header-tools { display: flex; align-items: center; gap: 24px; }
-    .statutt-link { font-size: .875rem; text-decoration: none; border-bottom: 1px solid var(--line); padding: 8px 0; }
-    .statutt-link:hover { color: var(--gold); border-color: var(--gold); }
-    .theme-picker { display: flex; align-items: center; gap: 8px; color: var(--muted); }
-    .theme-picker select { color: var(--text); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; min-height: 44px; font-size: .875rem; }
-    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
-    .intro { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; padding: 37px 0 29px; }
-    .eyebrow { color: var(--gold); font-size: .75rem; text-transform: uppercase; letter-spacing: .16em; font-weight: 650; margin: 0 0 9px; }
-    h1 { font-family: Georgia, "Times New Roman", serif; font-size: clamp(2rem, 4.6vw, 3.25rem); font-weight: 400; line-height: 1.12; letter-spacing: -.035em; margin: 0 0 12px; }
-    .intro p:last-child { color: var(--muted); margin: 0; max-width: 40rem; }
-    .humor-tag { flex-shrink: 0; color: var(--muted); font-size: .75rem; letter-spacing: .09em; text-transform: uppercase; border: 1px solid var(--line); border-radius: 5px; padding: 6px 10px; margin-bottom: 4px; }
-    .workspace { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
-    .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow); min-width: 0; }
-    .application { padding: 28px 30px 26px; }
-    .panel-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 27px; }
-    .panel-heading h2 { font-size: 1.0625rem; font-weight: 650; margin: 0; }
-    .panel-heading > span { font: .875rem Georgia, serif; color: var(--gold); }
-    .field { margin: 0 0 23px; }
-    .field-label { display: flex; align-items: center; gap: 11px; margin: 0 0 9px; font-size: .9375rem; font-weight: 650; }
-    .step { color: var(--muted); font-size: .75rem; font-weight: 400; font-variant-numeric: tabular-nums; }
-    .input-wrap { display: flex; align-items: center; background: var(--surface-raised); border: 1px solid var(--line); border-radius: 10px; padding-right: 17px; }
-    .input-wrap:focus-within { border-color: var(--gold); }
-    .input-wrap input { width: 100%; min-width: 0; padding: 10px 16px; border: 0; border-radius: 10px; color: var(--text); background: transparent; font-size: 1.5rem; font-weight: 500; font-variant-numeric: tabular-nums; }
-    .input-wrap > span { font-size: .875rem; color: var(--muted); white-space: nowrap; padding-left: 8px; }
-    .field select { width: 100%; min-height: 52px; border: 1px solid var(--line); border-radius: 10px; color: var(--text); background: var(--surface-raised); padding: 12px 13px; }
-    .hint { color: var(--muted); font-size: .875rem; line-height: 1.5; margin: 8px 0 0; }
-    .primary-button { width: 100%; min-height: 54px; padding: 13px 18px; display: flex; justify-content: space-between; align-items: center; gap: 12px; background: var(--button); color: var(--button-text); border: 1px solid transparent; border-radius: 10px; font-weight: 650; transition: transform .18s, filter .18s; }
-    .primary-button:hover { filter: brightness(1.08); transform: translateY(-1px); }
-    .primary-button:active { transform: translateY(1px); }
-    .form-footnote { font-size: .75rem; color: var(--muted); text-align: center; margin: 11px 0 0; }
-    .verdict { container-type: inline-size; position: relative; padding: 28px 30px 25px; overflow: hidden; border-color: var(--gold); background: radial-gradient(ellipse at 100% 0%, var(--gold-soft), transparent 68%), var(--surface); }
-    .verdict-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-bottom: 22px; border-bottom: 1px solid var(--line); }
-    .verdict-header h2 { margin: 0; font-size: .75rem; text-transform: uppercase; letter-spacing: .15em; color: var(--gold); font-weight: 600; }
-    .verdict-header svg { color: var(--gold); }
-    .verdict-content { padding: 31px 0 22px; text-align: center; }
-    .verdict-label { margin: 0 0 8px; color: var(--muted); font-size: .9375rem; }
-    .clock { display: block; font-size: 6.5rem; font-size: min(6.5rem, 25cqi); font-weight: 300; letter-spacing: -.06em; line-height: 1.12; font-variant-numeric: tabular-nums; color: var(--gold); margin: 0; }
-    .word-verdict { font-family: Georgia, "Times New Roman", serif; font-size: clamp(2.2rem, 4vw, 3.15rem); line-height: 1.18; font-weight: 400; margin: 18px 0 22px; letter-spacing: -.03em; color: var(--gold); overflow-wrap: anywhere; }
-    .verdict-caption { font-family: Georgia, "Times New Roman", serif; font-size: 1.3125rem; line-height: 1.4; font-style: italic; margin: 14px 0 0; }
-    .verdict-copy { color: var(--muted); margin: 14px auto 0; font-size: .9375rem; max-width: 34ch; }
-    .receipt { border-top: 1px solid var(--line); padding-top: 12px; margin: 0; }
-    .receipt > div { display: flex; justify-content: space-between; gap: 20px; padding: 5px 0; font-size: .875rem; }
-    .receipt dt { color: var(--muted); }
-    .receipt dd { margin: 0; font-variant-numeric: tabular-nums; text-align: right; }
-    .receipt .total { border-top: 1px dashed var(--line); margin-top: 10px; padding-top: 13px; }
-    .receipt .total dt, .receipt .total dd { color: var(--text); font-weight: 650; }
-    .awaiting-note { border-top: 1px dashed var(--line); padding-top: 18px; margin: 11px 0 0; text-align: center; font-size: .875rem; color: var(--muted); }
-    #mojitoBtn { width: 100%; min-height: 48px; display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 23px; padding: 11px 14px; border: 1px solid var(--line); border-radius: 10px; background: transparent; color: var(--mint); font-weight: 600; font-size: .9375rem; transition: background .18s, border-color .18s; }
-    #mojitoBtn:hover { background: var(--mint-soft); border-color: var(--mint); }
-    .mojito { margin-top: 18px; padding: 20px; background: var(--mint-soft); color: var(--mint); border: 1px solid var(--mint); border-radius: 12px; scroll-margin-top: 24px; }
-    .mojito h3 { font: 1.5rem/1.25 Georgia, serif; margin: 5px 0 10px; }
-    .mojito p { margin: 8px 0 0; font-size: .9375rem; }
-    .mojito .eyebrow { color: inherit; font-size: .75rem; }
-    .recalculate-note { padding: 12px 15px; border: 1px solid var(--gold); border-radius: 8px; color: var(--gold); font-size: .875rem; margin: 18px 0 0; }
-    #result { scroll-margin-top: 22px; }
-    .fine-print { margin: 20px 0 0; padding: 0 5px; }
-    .fine-print summary { font-size: .875rem; color: var(--muted); padding: 7px 0; }
-    .fine-print summary:hover { color: var(--text); }
-    .fine-print p { margin: 12px 0; color: var(--muted); font-size: .875rem; }
-    .equation { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 10px; margin: 18px 0; padding: 17px 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; font-family: Georgia, "Times New Roman", serif; font-size: 1.0625rem; }
-    .fraction { display: inline-flex; flex-direction: column; text-align: center; }
-    .fraction > span:first-child { border-bottom: 1px solid var(--muted); padding: 0 5px 4px; }
-    .fraction > span:last-child { padding: 4px 5px 0; }
-    .footer { display: flex; justify-content: space-between; gap: 20px; padding: 23px 0 27px; margin-top: 29px; border-top: 1px solid var(--line); color: var(--muted); font-size: .75rem; }
-    .footer p { margin: 0; }
-    .footer a { white-space: nowrap; }
-    @media (min-width: 761px) { .verdict-column { position: sticky; top: 24px; } }
-    @media (max-width: 760px) {
-      .shell { padding: 0 20px; max-width: 570px; }
-      .masthead { min-height: 82px; gap: 14px; }
-      .brand-note { font-size: .75rem; letter-spacing: .04em; }
-      .brand-name { font-size: .875rem; }
-      .header-tools { gap: 10px; }
-      .header-tools .statutt-link, .theme-picker svg { display: none; }
-      .intro { display: block; padding: 28px 0 24px; }
-      .intro p:last-child { font-size: .9375rem; }
-      .humor-tag { display: inline-block; margin: 16px 0 0; }
-      .workspace { grid-template-columns: minmax(0, 1fr); gap: 20px; }
-      .application, .verdict { padding: 24px; }
-      .panel-heading { margin-bottom: 23px; }
-      .clock { font-size: min(6.5rem, 25cqi); }
-      .footer { flex-direction: column; gap: 8px; }
-    }
-    @media (max-width: 360px) { .shell { padding: 0 14px; } .application, .verdict { padding: 20px; } .monogram { display: none; } }
-    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { transition: none !important; animation: none !important; } }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leggetid-Beregneren (Statutt X)</title>
+    <style>
+        :root {
+            --bg: #f0f0f0;
+            --text: #222;
+            --card: #ffffff;
+            --muted: #f9f9f9;
+            --border: #ddd;
+            --accent: #4CAF50;
+            --accent-hover: #45a049;
+            --link: #2e7d32;
+        }
+
+        body.dark {
+            --bg: #121212;
+            --text: #f1f1f1;
+            --card: #1e1e1e;
+            --muted: #222;
+            --border: #444;
+            --accent: #66bb6a;
+            --accent-hover: #57a85c;
+            --link: #81c784;
+        }
+
+        body { font-family: Arial, sans-serif; max-width: 400px; margin: 0 auto; padding: 30px; background: var(--bg); color: var(--text); font-size: 18px; }
+        h1 { text-align: center; color: var(--text); font-size: 28px; }
+        label { display: block; margin: 15px 0 8px; font-weight: bold; font-size: 18px; }
+        input, select { width: 100%; padding: 12px; margin-bottom: 15px; box-sizing: border-box; font-size: 18px; background: var(--card); color: var(--text); border: 1px solid var(--border); }
+        select { height: 60px; font-size: 20px; }
+        button { width: 100%; padding: 15px; background: var(--accent); color: white; border: none; cursor: pointer; font-size: 20px; }
+        button:hover { background: var(--accent-hover); }
+        #mojitoBtn { background: red !important; margin-top: 10px; }
+        #mojitoBtn:hover { background: darkred !important; }
+        #result { margin-top: 20px; padding: 20px; background: var(--card); border-radius: 5px; display: none; font-size: 18px; }
+        .mojito { background: #ffeb3b; color: #333; font-style: italic; padding: 15px; margin-top: 10px; border-radius: 5px; font-size: 18px; }
+        #mojitoDisplay { display: none; margin-top: 10px; padding: 20px; background: var(--muted); border: 1px solid var(--border); border-radius: 5px; text-align: center; font-size: 18px; }
+        #mojitoDisplay img { max-width: 100%; height: auto; margin-bottom: 10px; }
+        .statutt-link { text-align: center; margin: 20px 0; font-size: 16px; }
+        .statutt-link a { color: var(--link); text-decoration: none; font-weight: bold; }
+        .statutt-link a:hover { text-decoration: underline; }
+    </style>
 </head>
-<body class="dark">
-  <div class="shell">
-    <header class="masthead">
-      <div class="brand">
-        <span class="monogram" aria-hidden="true">DR</span>
-        <div><div class="brand-name">Dannelsesreisen</div><div class="brand-note">Leggetidberegneren</div></div>
-      </div>
-      <div class="header-tools">
-        <a class="statutt-link" href="statutter.html">Statuttene ↗</a>
-        <div class="theme-picker">
-          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20.9 13A9 9 0 0 1 11 3.1 9 9 0 1 0 20.9 13Z"/></svg>
-          <label for="tema" class="sr-only">Fargetema</label>
-          <select id="tema" onchange="settTema(this.value)"><option value="dark">Natt</option><option value="light">Dag</option></select>
-        </div>
-      </div>
-    </header>
-    <main>
-      <div class="intro">
-        <div>
-          <p class="eyebrow">I henhold til statutt 12</p>
-          <h1>Tid for å ta kvelden?</h1>
-          <p>En verdig retrett krever et uverdig detaljert regnestykke.</p>
-        </div>
-        <span class="humor-tag">100 % humor</span>
-      </div>
-      <div class="workspace">
-        <form class="panel application" id="application" novalidate onsubmit="event.preventDefault(); beregn();">
-          <div class="panel-heading"><h2>Din søknad om retrett</h2><span>§ 12</span></div>
-          <div class="field">
-            <label class="field-label" for="alder"><span class="step" aria-hidden="true">01</span> Alder i hele år</label>
-            <div class="input-wrap"><input type="number" id="alder" min="0" step="1" value="50" inputmode="numeric" aria-describedby="alderHint"><span aria-hidden="true">år</span></div>
-            <p class="hint" id="alderHint">Faktisk alder. Dansegulvets estimat teller ikke.</p>
-          </div>
-          <div class="field">
-            <label class="field-label" for="innsats"><span class="step" aria-hidden="true">02</span> Gårsdagens innsats</label>
-            <div class="input-wrap"><input type="number" id="innsats" min="0" step="0.1" value="0" inputmode="decimal" aria-describedby="innsatsHint"><span aria-hidden="true">minutter</span></div>
-            <p class="hint" id="innsatsHint">Minutter etter kl. 02:00 i går. Holdt du ut til 02:30? Før 30. Heltemotet er bokført.</p>
-          </div>
-          <div class="field">
-            <label class="field-label" for="unntak"><span class="step" aria-hidden="true">03</span> Særlige omstendigheter</label>
-            <select id="unntak" aria-describedby="unntakHint">
-              <option value="ingen">Ingen. Jeg møter regnestykket.</option>
-              <option value="sykdom">Alvorlig sykdom</option>
-              <option value="amputasjon">Amputasjon</option>
-              <option value="fengsling">Fengsling</option>
-              <option value="pudding">Pudding-prinsippet — jeg vil hjem</option>
-            </select>
-            <p class="hint" id="unntakHint">Vanlig gjesping er foreløpig ikke force majeure.</p>
-          </div>
-          <button class="primary-button" type="submit"><span>Beregn min leggetid</span><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></button>
-          <p class="form-footnote">Saksbehandlingstid: kortere enn en avskjedsklem.</p>
-        </form>
-        <div class="verdict-column">
-          <section class="panel verdict" aria-labelledby="verdictHeading">
-            <div class="verdict-header"><h2 id="verdictHeading">Kveldens vedtak</h2><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
-            <div id="placeholder">
-              <div class="verdict-content">
-                <p class="verdict-label">Ordinær leggetid, før fratrekk</p>
-                <p class="clock">02:00</p>
-                <p class="verdict-caption">Alle kvelder begynner med ambisjoner.</p>
-                <p class="verdict-copy">Oppgi alder og gårsdagens innsats. Vi finner ut når du kan gå med statuttene i behold.</p>
-              </div>
-              <p class="awaiting-note">Søknaden din avventer høytidelig behandling.</p>
-            </div>
-            <div id="result" role="status" aria-live="polite" aria-atomic="true" tabindex="-1" hidden></div>
-            <p id="recalculateNote" class="recalculate-note" hidden>Opplysningene er endret. Beregn på nytt for et oppdatert vedtak.</p>
-            <button type="button" id="mojitoBtn" onclick="mojitoProklamasjon()" aria-expanded="false" aria-controls="mojitoDisplay" hidden>
-              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m3 3 9 10 9-10H3Zm9 10v8m-5 0h10M6.6 7h10.8"/></svg>
-              Påberop Mojito-prinsippet
-            </button>
-            <div id="mojitoDisplay" class="mojito" role="status" tabindex="-1" hidden>
-              <p class="eyebrow">Innsigelse mottatt</p>
-              <h3>Retten heves. Baren vurderes.</h3>
-              <p>Mojito-prinsippet er påberopt. De øvrige medlemmene bes innta en introspektiv mine og vurdere én siste drink med åpent sinn.</p>
-              <p>Klokkeslettet står. Din prinsipielle uenighet er protokollført.</p>
-            </div>
-          </section>
-          <details class="fine-print">
-            <summary>Det matematiske alibiet</summary>
-            <div class="equation" role="math" aria-label="Fratrekk er 120 delt på 1 pluss e opphøyd i minus 0,2 ganger alder minus 60, pluss innsats">
-              <span aria-hidden="true">Fratrekk =</span><span class="fraction" aria-hidden="true"><span>120</span><span>1 + e<sup>−0,2(A − 60)</sup></span></span><span aria-hidden="true">+ I</span>
-            </div>
-            <p><strong>A</strong> er alder i hele år. <strong>I</strong> er minutter etter kl. 02:00 kvelden før. Aldersleddet har maksgrense 120 minutter og midtpunkt 60 år.</p>
-            <p>Fratrekket trekkes fra kl. 02:00. Beregnet leggetid blir aldri tidligere enn midnatt, og klokkeslettet rundes ned til hele minutter. Særunntak behandles separat.</p>
-            <p>En logistisk kurve. Et sosialt problem. Uforholdsmessig mye autoritet.</p>
-            <a class="statutt-link" href="statutter.html#leggetid">Les hele leggetidsstatutten ↗</a>
-          </details>
-        </div>
-      </div>
-      <noscript><p>Denne beregneren trenger JavaScript for å regne. <a href="statutter.html#leggetid">Du kan fortsatt lese leggetidsreglene her.</a></p></noscript>
-    </main>
-    <footer class="footer"><p>En humorberegner for Dannelsesreisen. Vedtakets tyngde overstiger kunnskapsgrunnlaget.</p><a href="statutter.html">Les statuttene ↗</a></footer>
-  </div>
-  <script>
-    initialiserTema();
-    function settTema(tema) {
-      document.body.classList.toggle('dark', tema === 'dark');
-      try { localStorage.setItem('tema', tema); } catch (_) { /* Tema virker også uten lagring. */ }
-    }
+<body>
+    <h1>Leggetidberegneren</h1>
+    <p><em>Standard: 02:00 (før fratrekk)</em></p>
+    
+    <label for="tema">Tema:</label>
+    <select id="tema" onchange="settTema(this.value)">
+        <option value="light">Lyst</option>
+        <option value="dark">Mørkt</option>
+    </select>
 
-    function initialiserTema() {
-      let lagretTema = 'dark';
-      try { lagretTema = localStorage.getItem('tema') || 'dark'; } catch (_) {}
-      if (lagretTema !== 'light' && lagretTema !== 'dark') lagretTema = 'dark';
-      document.getElementById('tema').value = lagretTema;
-      settTema(lagretTema);
-    }
+    <div class="statutt-link">
+        <a href="statutter.html" target="_blank">Les de omforente statuttene (åpnes i ny fane)</a>
+    </div>
 
-    // Beregningsformel og klokkeavrunding er bevart fra originalen.
-    function beregnFratrekk(alder, innsats) {
-        const maxFratrekk = 120;
-        const midtpunkt = 60;
-        const k = 0.2;
-        const logistisk = maxFratrekk / (1 + Math.exp(-k * (alder - midtpunkt)));
-        return logistisk + innsats;
-    }
+    <label for="alder">Din alder (hele år):</label>
+    <input type="number" id="alder" min="0" value="50">
 
-    function minutterTilKlokke(min) {
-        const timer = Math.floor(min / 60);
-        const m = Math.floor(min % 60);
-        return `${timer.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
-    }
+    <label for="innsats">Innsats kvelden før (minutter over kl 02:00):</label>
+    <input type="number" id="innsats" min="0" step="0.1" value="0">
 
-    function beregn() {
-      const alder = parseInt(document.getElementById('alder').value) || 50;
-      const innsats = parseFloat(document.getElementById('innsats').value) || 0;
-      const unntak = document.getElementById('unntak').value;
-      const resultDiv = document.getElementById('result');
-      let html = '';
-      let showMojitoBtn = false;
+    <label for="unntak">Unntak:</label>
+    <select id="unntak">
+        <option value="ingen">Ingen</option>
+        <option value="sykdom">Alvorlig sykdom</option>
+        <option value="amputasjon">Amputasjon</option>
+        <option value="fengsling">Fengsling</option>
+        <option value="pudding">Pudding-prinsippet</option>
+    </select>
 
-      if (unntak === 'sykdom') {
-        html = '<div class="verdict-content"><p class="verdict-label">Alvorlig sykdom · automatisk leggetid</p><p class="clock">23:00</p><p class="verdict-caption">Fullt fritak. Ingen diskusjon.</p><p class="verdict-copy">Her legger selv komiteen bort humoren. Ta kvelden, hvil deg og ta vare på deg selv.</p></div>';
-      } else if (unntak === 'amputasjon') {
-        html = '<div class="verdict-content"><p class="verdict-label">Amputasjon · særunntak</p><h3 class="word-verdict">Umiddelbar retrett.</h3><p class="verdict-caption">Søknaden anses tilstrekkelig begrunnet.</p><p class="verdict-copy">Komiteen frafaller kravet om personlig oppmøte ved avslutningen.</p></div>';
-      } else if (unntak === 'fengsling') {
-        html = '<div class="verdict-content"><p class="verdict-label">Fengsling · særunntak</p><h3 class="word-verdict">Retrett under oppsyn.</h3><p class="verdict-caption">Kvelden er nå utenfor vårt mandat.</p><p class="verdict-copy">Videre program fastsettes av vertskapet. Innsigelser rettes til vakthavende.</p></div>';
-      } else if (unntak === 'pudding') {
-        html = '<div class="verdict-content"><p class="verdict-label">Pudding-prinsippet</p><h3 class="word-verdict">Jeg er en pudding.</h3><p class="verdict-caption">Selvinnsikt er også en form for dannelse.</p><p class="verdict-copy">Du legger deg fordi du vil. Ingen utregning. Ingen anke. Betegnelsen blir stående i referatet.</p></div>';
-      } else {
-        const fratrekk = beregnFratrekk(alder, innsats);
-        let leggetidMin = 120 - fratrekk;
-        if (leggetidMin < 0) leggetidMin = 0;
-        const klokke = minutterTilKlokke(leggetidMin);
-        const minuttTekst = tall => tall.toFixed(1).replace('.', ',');
-        const kommentar = leggetidMin === 0 ? 'Du har gjort ditt. Og antakelig litt til.' : 'Retrett innvilget. Verdighet etter evne.';
-        html = `<div class="verdict-content"><p class="verdict-label">Din tidligste tillatte leggetid</p><p class="clock">${klokke}</p><p class="verdict-caption">${kommentar}</p></div>
-          <dl class="receipt"><div><dt>Ordinær leggetid</dt><dd>02:00</dd></div><div><dt>Aldersfratrekk · ${alder} år</dt><dd>${minuttTekst(beregnFratrekk(alder, 0))} min</dd></div><div><dt>Gårsdagens innsats</dt><dd>${minuttTekst(innsats)} min</dd></div><div class="total"><dt>Samlet fratrekk</dt><dd>${minuttTekst(fratrekk)} min</dd></div></dl>
-          <p class="verdict-copy">Ingen Mojito. God natt! Eventuelle prinsipielle innsigelser fremmes nedenfor.</p>`;
-        showMojitoBtn = true;
-      }
+    <button onclick="beregn()">Beregn Leggetid!</button>
 
-      document.getElementById('placeholder').hidden = true;
-      resultDiv.innerHTML = html;
-      resultDiv.hidden = false;
-      document.getElementById('recalculateNote').hidden = true;
-      const mojitoBtn = document.getElementById('mojitoBtn');
-      mojitoBtn.hidden = !showMojitoBtn;
-      mojitoBtn.setAttribute('aria-expanded', 'false');
-      document.getElementById('mojitoDisplay').hidden = true;
-      resultDiv.focus({ preventScroll: true });
-      resultDiv.scrollIntoView({ block: 'nearest' });
-    }
+    <div id="result"></div>
+    <div id="mojitoDisplay">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Standard_version_of_Mojito_Cocktail.jpg" alt="Mojito Cocktail">
+        <p><strong>Mojito-prinsippet er påberopt!</strong><br>Ansikt må nå holdes i en introspektiv mine. Tanker og sinn må være åpne mens man vurderer dette!</p>
+    </div>
 
-    function mojitoProklamasjon() {
-      const display = document.getElementById('mojitoDisplay');
-      display.hidden = false;
-      document.getElementById('mojitoBtn').setAttribute('aria-expanded', 'true');
-      display.focus({ preventScroll: true });
-      display.scrollIntoView({ block: 'nearest' });
-      // Prinsippet er en proklamasjon. Det endrer aldri beregnet leggetid.
-    }
+    <script>
+        initialiserTema();
+        function settTema(tema) {
+            document.body.classList.toggle('dark', tema === 'dark');
+            localStorage.setItem('tema', tema);
+        }
 
-    document.getElementById('application').addEventListener('input', function () {
-      if (!document.getElementById('result').hidden) {
-        document.getElementById('recalculateNote').hidden = false;
-        document.getElementById('mojitoBtn').hidden = true;
-        document.getElementById('mojitoBtn').setAttribute('aria-expanded', 'false');
-        document.getElementById('mojitoDisplay').hidden = true;
-      }
-    });
-  </script>
+        function initialiserTema() {
+            const lagretTema = localStorage.getItem('tema') || 'light';
+            document.getElementById('tema').value = lagretTema;
+            settTema(lagretTema);
+        }
+
+        function beregnFratrekk(alder, innsats) {
+            const maxFratrekk = 120;
+            const midtpunkt = 60;
+            const k = 0.2;
+            const logistisk = maxFratrekk / (1 + Math.exp(-k * (alder - midtpunkt)));
+            return logistisk + innsats;
+        }
+
+        function minutterTilKlokke(min) {
+            const timer = Math.floor(min / 60);
+            const m = Math.floor(min % 60);
+            return `${timer.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+        }
+
+        function beregn() {
+            const alder = parseInt(document.getElementById('alder').value) || 50;
+            const innsats = parseFloat(document.getElementById('innsats').value) || 0;
+            const unntak = document.getElementById('unntak').value;
+
+            const resultDiv = document.getElementById('result');
+            let html = '<h3>Resultat:</h3>';
+
+            let showMojitoBtn = false;
+
+            if (unntak === 'sykdom') {
+                html += '<p>Alvorlig sykdom: Automatisk 23:00. Hvil deg!</p>';
+            } else if (unntak === 'amputasjon') {
+                html += '<p>Amputasjon: Umiddelbar retré. Det er sikkert bra igjen i morgen.</p>';
+            } else if (unntak === 'fengsling') {
+                html += '<p>Fengsling. Nyt det mens du kan, i morgen er det på\'an igjen.</p>';
+            } else if (unntak === 'pudding') {
+                html += '<p>Pudding-prinsippet: Jeg er en PUDDING! Jeg legger meg før leggetid. Som en PUDDING, altså</p>';
+            } else {
+                const fratrekk = beregnFratrekk(alder, innsats);
+                let leggetidMin = 120 - fratrekk;
+                if (leggetidMin < 0) leggetidMin = 0;
+                html += `<p>Fratrekk: ${fratrekk.toFixed(1)} min</p>`;
+                html += `<p>Din leggetid: ${minutterTilKlokke(leggetidMin)}</p>`;
+                html += '<p>Ingen Mojito. God natt!</p>';
+                showMojitoBtn = true;
+            }
+
+            resultDiv.innerHTML = html;
+            resultDiv.style.display = 'block';
+            resultDiv.scrollIntoView();
+
+            // Vis eller skjul Mojito-knapp
+            const mojitoBtn = document.getElementById('mojitoBtn');
+            if (showMojitoBtn) {
+                if (!mojitoBtn) {
+                    const btn = document.createElement('button');
+                    btn.id = 'mojitoBtn';
+                    btn.innerText = 'Påberop Mojito-Prinsippet!';
+                    btn.onclick = mojitoProklamasjon;
+                    resultDiv.appendChild(btn);
+                }
+            }
+        }
+
+        function mojitoProklamasjon() {
+            document.getElementById('mojitoDisplay').style.display = 'block';
+            document.getElementById('mojitoDisplay').scrollIntoView();
+            // Legg til +15 min logikk hvis ønskelig, men holder det enkelt som popup
+        }
+    </script>
 </body>
 </html>

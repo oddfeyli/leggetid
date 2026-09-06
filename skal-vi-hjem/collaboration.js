@@ -299,6 +299,9 @@
     copy(text.join('\n'));
   });
   window.addEventListener('online',() => { flush(); refresh(); });
+  // A new invitation opened in this tab may change only the fragment.
+  // Reload to read the new room; beforeunload still protects pending edits.
+  window.addEventListener('hashchange',() => location.reload());
   window.addEventListener('offline',() => { if (snapshotData) fail(new Error('Frakoblet')); });
   window.addEventListener('beforeunload',event => { if (dirty()) { event.preventDefault(); event.returnValue = ''; } });
   document.addEventListener('visibilitychange',() => { if (document.visibilityState === 'visible') { flush(); refresh(); } else flush(); });
