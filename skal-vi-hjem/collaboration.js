@@ -71,6 +71,9 @@
       if (error) throw error;
     }
     userId = data.session && data.session.user.id;
+    // Attach the user's JWT before joining Realtime. With a publishable key,
+    // an unauthenticated channel cannot inspect this table's filter columns.
+    if (data.session) await db.realtime.setAuth(data.session.access_token);
     return Boolean(userId);
   }
   async function rpc(action,payload={},id=roomId) {

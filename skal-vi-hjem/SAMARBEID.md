@@ -1,16 +1,14 @@
 # Skal vi hjem? – felles kvelder
 
-## Status 5. september 2026
+## Status 6. september 2026
 
-Samarbeidskoden er klargjort, men **ikke aktivert**. Supabase-prosjektet `skal-vi-hjem` (`gmuupsahnfoooiinpwfs`) er opprettet i Stockholm (`eu-north-1`) på eksisterende gratisplan. Databasen, RLS og Realtime er installert og kontrollert. Bare prosjekt-URL og offentlig publishable key er lagt inn i `collaboration-config.js`; `enabled: false` er beholdt.
+Supabase-prosjektet `skal-vi-hjem` (`gmuupsahnfoooiinpwfs`) kjører i Stockholm (`eu-north-1`) på eksisterende gratisplan. Database, RLS og Realtime er installert. Anonymous Sign-Ins er aktivert og bekreftet gjennom faktisk innlogging med separate identiteter. Klientkonfigurasjonen inneholder bare prosjekt-URL og offentlig publishable key.
 
-**Gjenstående sperre:** Anonymous Sign-Ins er fortsatt deaktivert, bekreftet mot prosjektets `/auth/v1/settings`. Supabase-integrasjonen har ingen handling for Auth-konfigurasjon, og innlogging til kontrollpanelet ble ikke fullført. Aktiver **Allow anonymous sign-ins** under [Authentication → Sign In / Providers](https://supabase.com/dashboard/project/gmuupsahnfoooiinpwfs/auth/providers) før live-testene kjøres. Ingen secrets eller administrasjonsnøkler trengs i appen eller testene.
+Kjørte migreringer: `svh_collaboration_initial` og `svh_strict_payloads`. `collaboration.sql` er det samlede oppsettet for en ny database; ikke kjør det om igjen i det eksisterende prosjektet.
 
-Kjørte migreringer: `svh_collaboration_initial` og `svh_strict_payloads`. `collaboration.sql` inneholder det samlede oppsettet for en ny database og skal ikke kjøres om igjen i dette allerede opprettede prosjektet.
+Live-testene fant at Realtime kunne koble til før brukerens JWT var satt. `connect()` venter nå på `db.realtime.setAuth(session.access_token)` før kanalen opprettes. Kontrollert feilsøking viste at dette rettet manglende PostgreSQL-varsler uten å gi den utloggede rollen lesetilgang.
 
-Neste steg: bekreft anonym Auth, kjør `node tests/skal-vi-hjem-live.mjs` fra repoets rot, test klientflyten med to separate nettleseridentiteter, og aktiver/publiser først når kontrollene består. PR #3 er fortsatt et utkast; GitHub Pages er ikke endret.
-
-Original `index.html`, `app-1.js`, `app-2.js`, `app-3.js`, CSS og lokal lagring er uendret. Den nye siden er `sammen.html`. Den gjenbruker modellfunksjonene i `app-1.js`, men kjører ikke originalens lokal-lagringskode.
+Alle 16 live-testpunkter bestod 6. september 2026. Samarbeidsmodus er aktivert i konfigurasjonen for publisering til GitHub Pages via PR #3. Lokalmodus og beregningsfilene `app-1.js`, `app-2.js` og `app-3.js` er bevart. En tydelig lenke fra lokalappen åpner `sammen.html`, som gjenbruker den opprinnelige modellen uten å kjøre lokal-lagringskoden.
 
 ## Implementert i kode
 
@@ -40,15 +38,17 @@ Supabase lagrer samarbeidsdata; jsDelivr leverer klientbiblioteket ved tilkoblin
 
 ## Teststatus
 
+**Live-resultat 6. september 2026: 16 bestått, 0 feilet.** Testen brukte tre ulike ekte anonyme Auth-identiteter og faktiske WebSocket-kanaler. Samtidige feltendringer ble bevart, begge deltakere mottok revisjoner, og en utenforstående mottok ingen beskyttede romdata. Både direkte skriving, fremmede rom, ugyldige verdier, ekstra felt og gamle invitasjoner ble avvist. Vertsstyrte innstillinger, gjeninnmelding, avreise/retur, gjenoppkobling og sletting bestod.
+
 JavaScript-syntakskontroll er bestått. Sju frontend-sjekker er kjørt i headless Chromium med to separate nettleserkontekster og en kontrollert **simulert** database/sanntidskanal: deaktivert konfigurasjon, delt manntall og UI-rettigheter, samtidige endringer og lik gruppedom, avreise/retur, ny sending etter feil, gjeninntreden med samme testidentitet samt mobilbredde uten JavaScript-feil.
 
-**Kontrollert i Supabase:** begge migreringene kjørte uten feil; alle tre tabeller har RLS; rom og medlemmer har medlemsavgrensede SELECT-policyer; bare `public.svh_rooms` ligger i Realtime-publikasjonen. Den private invitasjonstabellen har ingen klienttilgang. Security Advisor rapporterer ingen advarsler eller feil, bare den tilsiktede INFO-merknaden om RLS uten policy på `svh_private.invites`. Den oppdaterte RPC-funksjonen er lest tilbake og samsvarer med lokal SQL. Alle 13 direkte PostgreSQL-tester av deltakerverdier bestod.
+**Kontrollert i Supabase:** begge migreringene kjørte uten feil; alle tre tabeller har RLS; rom og medlemmer har medlemsavgrensede SELECT-policyer; bare `public.svh_rooms` ligger i Realtime-publikasjonen. Den private invitasjonstabellen har ingen klienttilgang. Security Advisor viser forventede merknader om medlemsavgrensede policyer som tillater anonyme Auth-brukere, samt RLS uten direkte lesepolicy på `svh_private.invites`. Passordlekkasjebeskyttelse er ikke aktivert; appen bruker ikke passordinnlogging. Den oppdaterte RPC-funksjonen er lest tilbake og samsvarer med lokal SQL. Alle 13 direkte PostgreSQL-tester av deltakerverdier bestod.
 
-**Klargjort for ekte tjenestetest:** `../tests/skal-vi-hjem-live.mjs` bruker tre separate anonyme Auth-identiteter og bare den offentlige klientnøkkelen. Den kontrollerer samtidige feltendringer, vertstilgang, direkte skrivesperrer, romisolasjon, ugyldige verdier/ekstra felt, invitasjonsrotering, faktisk Realtime over WebSocket, gjenoppkobling og romsletting. Testen sletter sine egne testrom og logger ut testidentitetene. En valgfri rapport (`SVH_REPORT_PATH=/tmp/svh-live-report.json`) gir rom- og bruker-ID-er for databaseeierens etterkontroll; tokens og invitasjoner logges ikke. Anonyme Auth-kontoer må ryddes separat av eieren.
+**Ekte tjenestetest:** `../tests/skal-vi-hjem-live.mjs` bruker tre separate anonyme Auth-identiteter og bare den offentlige klientnøkkelen. Den kontrollerer samtidige feltendringer, vertstilgang, direkte skrivesperrer, romisolasjon, ugyldige verdier/ekstra felt, invitasjonsrotering, faktisk Realtime over WebSocket, gjenoppkobling og romsletting. Testen sletter sine egne testrom og logger ut testidentitetene. En valgfri rapport (`SVH_REPORT_PATH=/tmp/svh-live-report.json`) gir rom- og bruker-ID-er for databaseeierens etterkontroll; tokens og invitasjoner logges ikke. Anonyme Auth-kontoer må ryddes separat av eieren.
 
 **Bestått utløpstest i PostgreSQL:** `../tests/skal-vi-hjem-expiry.sql` oppretter midlertidige vert-/gjest-fixtures i én transaksjon. Begge har tilgang før utløp; deretter skjuler RLS rom og medlemmer for begge, og alle seks `state`/`me`/`join`-forsøk avvises med `P0002`. Testen bruker database-rollen `authenticated` med syntetiske JWT-claims, ikke ekte Auth-pålogging. Alt ble rullet tilbake; null fixture-brukere og null fixture-rom gjenstod.
 
-**Ikke kjørt ennå:** ekte anonym Auth, live API-/WebSocket-test, to samtidige nettleseridentiteter mot Supabase, Edge og iOS Safari. Ikke beskriv disse som bestått før de faktisk er kjørt. Den eldre `../tests/skal-vi-hjem-browser.py` injiserer HTML/skript med simulert backend og er ikke bevis på databasesikkerhet.
+**Nettleseromfang:** den automatiserte live-testen bruker separate Supabase JS-klienter i Node med ekte Auth og WebSocket, ikke separate nettleserprosesser. Den publiserte brukerflyten kontrolleres i Chrome med en annen samtidig testklient. Edge og fysisk iOS Safari er ikke tilgjengelige i testmiljøet. Den eldre `../tests/skal-vi-hjem-browser.py` bruker separate Chromium-kontekster med simulert backend; den er ikke bevis på databasesikkerhet.
 
 ## Referanser for oppsettet
 

@@ -94,6 +94,7 @@ async function rejected(promise, label) {
 async function signIn(db) {
   const data = good(await db.auth.signInAnonymously(), 'anonymous sign-in');
   assert.equal(data.user.is_anonymous, true);
+  await db.realtime.setAuth(data.session.access_token);
   db.testUserId = data.user.id;
   report.anonymousUserIds.push(data.user.id);
   return data.user.id;

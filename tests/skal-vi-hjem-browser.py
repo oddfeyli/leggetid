@@ -47,13 +47,14 @@ def api(uid, action, rid, p):
 
 MOCK="""
 window.supabase={createClient:()=>({
+ realtime:{setAuth:async()=>{}},
  auth:{getSession:async()=>({data:{session:{user:{id:USER}}},error:null}),signInAnonymously:async()=>({data:{session:{user:{id:USER}}},error:null})},
  rpc:async(_,a)=>{if(window.mockFail) return {data:null,error:{message:'Simulert nettverksbrudd'}}; return await window.testRPC(USER,a.p_action,a.p_room,a.p_payload)},
  channel:()=>{const c={on:(_,__,callback)=>{c.cb=callback;return c},subscribe:cb=>{setTimeout(()=>cb('SUBSCRIBED'),10);c.t=setInterval(()=>c.cb(),180);return c}};return c},
  removeChannel:async c=>clearInterval(c.t)
 })};
 """
-def fixture(page, invitation=''):
+def fixture(page, invitation='', disabled=False):
     html=(ROOT/'sammen.html').read_text()
     html=re.sub(r'<script[^>]*>[\s\S]*?</script>','',html)
     html=re.sub(r'<link[^>]*rel="stylesheet"[^>]*>','',html)
@@ -61,7 +62,7 @@ def fixture(page, invitation=''):
     for css in ['style-1.css','style-2.css','style-3.css']:
         page.add_style_tag(content=(ROOT/css).read_text())
     if invitation: page.evaluate('(h)=>{location.hash=h}',invitation.split('#',1)[1])
-    page.add_script_tag(content=(ROOT/'collaboration-config.js').read_text())
+    page.add_script_tag(content="window.SVH_CLOUD={enabled:false}" if disabled else (ROOT/'collaboration-config.js').read_text())
     page.add_script_tag(content=(ROOT/'app-1.js').read_text())
     page.add_script_tag(content=(ROOT/'collaboration.js').read_text())
 
@@ -69,7 +70,7 @@ results=[]
 with sync_playwright() as p:
     browser=p.chromium.launch(executable_path='/usr/bin/chromium',headless=True,args=['--no-sandbox'])
     page=browser.new_page(viewport={'width':390,'height':844}); requests=[];page.on('request',lambda r:requests.append(r.url))
-    fixture(page);page.wait_for_selector('#cloud-setup',state='visible')
+    fixture(page,disabled=True);page.wait_for_selector('#cloud-setup',state='visible')
     assert not any('supabase.co' in r or 'jsdelivr' in r for r in requests)
     assert page.locator('#cloud-entry').is_hidden()
     assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
